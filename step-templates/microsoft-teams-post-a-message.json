@@ -5,7 +5,7 @@
   "ActionType": "Octopus.Script",
   "Version": 14,
   "Properties": {
-    "Octopus.Action.Script.ScriptBody": "[int]$timeoutSec = $null\nif(-not [int]::TryParse($OctopusParameters['Timeout'], [ref]$timeoutSec)) { $timeoutSec = 60 }\n\n$payload = @{\n    title = $OctopusParameters['Title']\n    text = $OctopusParameters['Body'];\n    themeColor = $OctopusParameters['Color'];\n}\n\nInvoke-RestMethod -Method POST -Uri $OctopusParameters['HookUrl'] -Body ($payload | ConvertTo-Json -Depth 4) -ContentType 'application/json; charset=utf-8' -TimeoutSec $timeoutSec",
+    "Octopus.Action.Script.ScriptBody": "[int]$timeoutSec = $null\nif(-not [int]::TryParse($OctopusParameters['Timeout'], [ref]$timeoutSec)) { $timeoutSec = 60 }\n\n$payload = @{\n    title = $OctopusParameters['Title']\n    text = $OctopusParameters['Body'];\n    themeColor = $OctopusParameters['Color'];\n}\n\ntry {\nInvoke-RestMethod -Method POST -Uri $OctopusParameters['HookUrl'] -Body ($payload | ConvertTo-Json -Depth 4) -ContentType 'application/json; charset=utf-8' -TimeoutSec $timeoutSec -ErrorAction SilentlyContinue\nWrite-host \"Message has been delivered\"\n}\n\ncatch {\nreturn \"StatusCode: $_\"\nreturn \"StatusDescription: $_\"\n}",
     "Octopus.Action.Script.Syntax": "PowerShell",
     "Octopus.Action.Script.ScriptSource": "Inline"
   },
